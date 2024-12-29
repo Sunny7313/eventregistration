@@ -1,81 +1,97 @@
 <?php
+
 use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
 
-require 'vendor/autoload.php'; // Load PHPMailer
-
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $name = $_POST['name'];
-    $email = $_POST['email'];
-    $phone = $_POST['phone'];
-    $rollno = $_POST['rollno'];
-    $college = $_POST['college'];
-    $event = $_POST['event'];
-    $utr = $_POST['utr'];
-    $paymentScreenshot = $_FILES['paymentScreenshot'];
+    // Database connection
+    $host = 'localhost';
+    $db = 'event_registration';
+    $user = 'root';
+    $pass = '';
 
-    // Coordinator details
-    $coordinatorName = "John Doe";
-    $coordinatorEmail = "coordinator@example.com";
-    $coordinatorPhone = "9876543210";
+    try {
+        $conn = new PDO("mysql:host=$host;dbname=$db", $user, $pass);
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    // Save payment screenshot to server
-    $targetDir = "uploads/";
-    $targetFile = $targetDir . basename($paymentScreenshot["name"]);
-    if (!move_uploaded_file($paymentScreenshot["tmp_name"], $targetFile)) {
-        die("Error uploading file.");
+        // Get form data
+        $name = $_POST['name'];
+        $email = $_POST['email'];
+        $phone = $_POST['phone'];
+        $rollno = $_POST['rollno'];
+        $college = $_POST['college'];
+        $event = $_POST['event'];
+        $utr_id = $_POST['utr'];
+        $originalFileName = $_FILES['paymentScreenshot']['name'];
+        
+        // Handle payment screenshot upload
+        $target_dir = "uploads/";
+        $fileExtension = pathinfo($originalFileName, PATHINFO_EXTENSION);
+        $uniqueFileName = pathinfo($originalFileName, PATHINFO_FILENAME) . '_' . time() . '.' . $fileExtension;
+        $target_file = $target_dir . $uniqueFileName;
+
+        if (!move_uploaded_file($_FILES['paymentScreenshot']['tmp_name'], $target_file)) {
+            throw new Exception("Failed to upload file.");
+        }
+        // Insert data into the database
+        $stmt = $conn->prepare("INSERT INTO registrations (name, email, phone, rollno, college_name, event_name, utr_id, payment_screenshot) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+        if (sendMail($email, $name, $utr_id, $event)) {
+            $stmt->execute([$name, $email, $phone, $rollno, $college, $event, $utr_id, $uniqueFileName]);
+
+            echo "<script>alert('Registration successful, and email sent!');window.location='index.html'</script>";
+        } else {
+            echo "Registration unsuccessful, email failed to send.";
+        }
+    } catch (PDOException $e) {
+        echo "Error: " . $e->getMessage();
     }
+}
 
-    // Save data to database (this part assumes a working DB connection)
-    // Example: INSERT INTO registrations (name, email, phone, rollno, college, event, utr, payment_screenshot) VALUES (...);
+function sendMail($recipientEmail, $recipientName, $utrID, $eventName)
+{
+    require("PHPMailer/Exception.php");
+    require("PHPMailer/SMTP.php");
+    require("PHPMailer/PHPMailer.php");
 
-    // Prepare email invoice
     $mail = new PHPMailer(true);
+    
     try {
         // Server settings
+        $mail->SMTPDebug = SMTP::DEBUG_OFF; // Set to SMTP::DEBUG_SERVER for debugging
         $mail->isSMTP();
-        $mail->Host = 'smtp.example.com'; // Replace with your SMTP server
+        $mail->Host = 'smtp.gmail.com';
         $mail->SMTPAuth = true;
         $mail->Username = 'sanyasi.naidu.336@gmail.com'; // Replace with your SMTP username
-        $mail->Password = ''; // Replace with your SMTP password
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-        $mail->Port = 587;
-
+        $mail->Password = 'ydrd nkhh qprm yjuu';    // Replace with your app password (not your Gmail password)
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+        $mail->Port = 465; // Use 465 for SMTPS
         // Recipients
-        $mail->setFrom('no-reply@example.com', 'Event Registration');
-        $mail->addAddress($email, $name);
-
-        // Attachments
-        $mail->addAttachment($targetFile, 'Payment Screenshot');
-
+        $mail->setFrom('sanyasi.naidu/336@gmail.com', 'Event Team');
+        $mail->addAddress($recipientEmail, $recipientName);
         // Content
         $mail->isHTML(true);
-        $mail->Subject = "Registration Invoice for $event";
-        $mail->Body = "<h1>Thank you for registering!</h1>
-                        <p>Dear $name,</p>
-                        <p>We have received your registration for the event: <strong>$event</strong>.</p>
-                        <p>Details:</p>
-                        <ul>
-                            <li><strong>Name:</strong> $name</li>
-                            <li><strong>Email:</strong> $email</li>
-                            <li><strong>Phone:</strong> $phone</li>
-                            <li><strong>Roll Number:</strong> $rollno</li>
-                            <li><strong>College:</strong> $college</li>
-                            <li><strong>UTR ID:</strong> $utr</li>
-                        </ul>
-                        <p><strong>Event Coordinator:</strong></p>
-                        <ul>
-                            <li><strong>Name:</strong> $coordinatorName</li>
-                            <li><strong>Email:</strong> $coordinatorEmail</li>
-                            <li><strong>Phone:</strong> $coordinatorPhone</li>
-                        </ul>
-                        <p>For any queries, please contact the event coordinator.</p>
-                        <p>Best regards,<br>Event Team</p>";
+        $mail->Subject = "Registration Confirmation for " . $eventName;
+        // Email Body
+        $mail->Body = '
+            <h1>Thank you for registering, ' . htmlspecialchars($recipientName) . '!</h1>
+            <p>We have received your registration for the <strong>' . htmlspecialchars($eventName) . '</strong> event.</p>
+            <p>Your UTR ID is: <strong>' . htmlspecialchars($utrID) . '</strong></p>
+            <p>For any queries, please contact the event coordinator:</p>
+            <ul>
+                <li><strong>Name:</strong> John Doe</li>
+                <li><strong>Email:</strong> coordinator@example.com</li>
+                <li><strong>Phone:</strong> 1234567890</li>
+            </ul>
+            <p>Looking forward to seeing you at the event!</p>
+        ';
 
+        // Send email
         $mail->send();
-        echo "Registration successful! An invoice has been sent to your email.";
+        return true; 
     } catch (Exception $e) {
-        echo "Registration successful, but email could not be sent. Mailer Error: {$mail->ErrorInfo}";
+        error_log("Error sending email: " . $mail->ErrorInfo);
+        return false; // Failed to send email
     }
 }
 
@@ -122,4 +138,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $conn->close();
- */?>
+ */
