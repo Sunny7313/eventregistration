@@ -36,8 +36,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
         // Insert data into the database
         $stmt = $conn->prepare("INSERT INTO registrations (name, email, phone, rollno, college_name, event_name, utr_id, payment_screenshot) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->execute([$name, $email, $phone, $rollno, $college, $event, $utr_id, $uniqueFileName]);
         if (sendMail($email, $name, $utr_id, $event)) {
-            $stmt->execute([$name, $email, $phone, $rollno, $college, $event, $utr_id, $uniqueFileName]);
 
             echo "<script>alert('Registration successful, and email sent!');window.location='index.html'</script>";
         } else {
