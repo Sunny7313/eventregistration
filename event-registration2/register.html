@@ -7,19 +7,137 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
     <style>
+    
         #upiQr {
             display: block;
             margin: 20px auto;
             max-width: 200px;
         }
+
+        /* From Uiverse.io by Yaya12085 */ 
+.container {
+  height: 300px;
+  width: 300px;
+  border-radius: 10px;
+  box-shadow: 4px 4px 30px rgba(0, 0, 0, .2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  gap: 5px;
+  background-color: rgba(0, 110, 255, 0.041);
+}
+
+.header {
+  flex: 1;
+  width: 100%;
+  border: 2px dashed royalblue;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.header svg {
+  height: 100px;
+}
+
+.header p {
+  text-align: center;
+  color: black;
+}
+
+.footer {
+  background-color: rgba(0, 110, 255, 0.075);
+  width: 100%;
+  height: 40px;
+  padding: 8px;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  color: black;
+  border: none;
+}
+
+.footer svg {
+  height: 130%;
+  fill: royalblue;
+  background-color: rgba(70, 66, 66, 0.103);
+  border-radius: 50%;
+  padding: 2px;
+  cursor: pointer;
+  box-shadow: 0 2px 30px rgba(0, 0, 0, 0.205);
+}
+
+.footer p {
+  flex: 1;
+  text-align: center;
+}
+
+#file {
+  display: none;
+}
+
+/* From Uiverse.io by adamgiebl */ 
+.container {
+  width: 100%;
+  height: 100%;
+  --color: rgba(114, 114, 114, 0.3);
+  background-color: #191a1a;
+  background-image: linear-gradient(0deg, transparent 24%, var(--color) 25%, var(--color) 26%, transparent 27%,transparent 74%, var(--color) 75%, var(--color) 76%, transparent 77%,transparent),
+      linear-gradient(90deg, transparent 24%, var(--color) 25%, var(--color) 26%, transparent 27%,transparent 74%, var(--color) 75%, var(--color) 76%, transparent 77%,transparent);
+  background-size: 55px 55px;
+}
+
+       :root {
+            --color: rgba(114, 114, 114, 0.3);
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            background-color: #191a1a;
+            background-image: 
+                linear-gradient(0deg, 
+                    transparent 24%, 
+                    var(--color) 25%, 
+                    var(--color) 26%, 
+                    transparent 27%, 
+                    transparent 74%, 
+                    var(--color) 75%, 
+                    var(--color) 76%, 
+                    transparent 77%, 
+                    transparent),
+                linear-gradient(90deg, 
+                    transparent 24%, 
+                    var(--color) 25%, 
+                    var(--color) 26%, 
+                    transparent 27%, 
+                    transparent 74%, 
+                    var(--color) 75%, 
+                    var(--color) 76%, 
+                    transparent 77%, 
+                    transparent);
+            background-size: 55px 55px;
+        }
     </style>
 </head>
 <body>
+<div class="container">
+<!--
     <header class="bg-primary text-white text-center py-4">
         <h1>Event Registration</h1>
     </header>
-
+-->
     <section class="container mt-5">
+
+    <!--
         <form action="submit.php" method="POST" enctype="multipart/form-data" class="mx-auto" style="max-width: 600px;">
             <div class="mb-3">
                 <label for="name" class="form-label">Name</label>
@@ -62,8 +180,98 @@
             </div>
             <button type="submit" class="btn btn-primary">Submit</button>
         </form>
-    </section>
+-->
+        <!--another form-->
+        <form class="form" action="submit.php" method="POST" enctype="multipart/form-data" class="mx-auto" style="max-width: 600px;">
+    <p class="title"> Event Register </p>
+    <p class="message">Signup now and get full access to our app. </p>
+            <label >Name</label>
+        <div class="flex">
+        <label>
+            <input required="" placeholder="" type="text" id=" frist name" class="input">
+            <span>First name</span>
+        </label>
 
+        <label>
+            <input required="" placeholder="" type="text" id=" last name" class="input">
+            <span>Last name</span>
+        </label>
+    </div>  
+    <label >Email</label>        
+    <label>
+        <input required="" placeholder="" type="email"  id=" email" class="input">
+        <span></span>
+    </label> 
+     <label >Phone Number</label>  
+    <label>
+        <input required="" placeholder="" type="text"  id="phone" class="input" >
+        <span></span>
+    </label>
+        <label >Roll Number</label>        
+    <label>
+        <input required="" placeholder="" type="text" id="roll number" class="input">
+        <span></span>
+    </label> 
+           <label >College Name</label>        
+    <label>
+        <input required="" placeholder="" type="text" id="college name" class="input">
+        <span></span>
+    </label>
+     <div class="mb-3">
+                <label for="event" class="form-label">Select Event</label>
+                <select class="form-select" id="event" name="event" required onchange="updateUPI()">
+                    <option value="Coding Hackathon">Coding Hackathon</option>
+                    <option value="Robotics Workshop">Robotics Workshop</option>
+                    <option value="AI Seminar">AI Seminar</option>
+                </select>
+            </div>
+        <div class="text-center">
+                <img id="upiQr" src="images/default-qr.png" alt="UPI QR Code">
+        </div>
+
+            <div class="mb-3">
+                <label for="utr" class="form-label">UTR ID</label>
+                <input type="text" class="form-control" id="utr" name="utr" required>
+
+            </div>
+    <!--
+                    <div class="mb-3">
+                <label for="paymentScreenshot" class="form-label">Upload Payment Screenshot</label>
+                <input type="file" class="form-control" id="paymentScreenshot" name="paymentScreenshot" required>
+            </div>
+            -->
+            <!--**********************************************************************-->
+
+<!--
+  <div class="header"> 
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> 
+      <path d="M7 10V9C7 6.23858 9.23858 4 12 4C14.7614 4 17 6.23858 17 9V10C19.2091 10 21 11.7909 21 14C21 15.4806 20.1956 16.8084 19 17.5M7 10C4.79086 10 3 11.7909 3 14C3 15.4806 3.8044 16.8084 5 17.5M7 10C7.43285 10 7.84965 10.0688 8.24006 10.1959M12 12V21M12 12L15 15M12 12L9 15" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg> <p>Upload Payment Screenshot</p>
+  </div> 
+  <label for="file" class="footer"> 
+    <svg fill="#000000" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><path d="M15.331 6H8.5v20h15V14.154h-8.169z"></path><path d="M18.153 6h-.009v5.342H23.5v-.002z"></path></g></svg> 
+    <p>Not selected file</p> 
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M5.16565 10.1534C5.07629 8.99181 5.99473 8 7.15975 8H16.8402C18.0053 8 18.9237 8.9918 18.8344 10.1534L18.142 19.1534C18.0619 20.1954 17.193 21 16.1479 21H7.85206C6.80699 21 5.93811 20.1954 5.85795 19.1534L5.16565 10.1534Z" stroke="#000000" stroke-width="2"></path> <path d="M19.5 5H4.5" stroke="#000000" stroke-width="2" stroke-linecap="round"></path> <path d="M10 3C10 2.44772 10.4477 2 11 2H13C13.5523 2 14 2.44772 14 3V5H10V3Z" stroke="#000000" stroke-width="2"></path> </g></svg>
+  </label> 
+  <input id="file" type="file"> 
+</div>
+-->
+<div class="text-center mt-4">
+    <label for="paymentScreenshot" class="d-flex flex-column align-items-center border p-3 rounded bg-light cursor-pointer">
+        <svg width="50" height="50" fill="#007bff" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M7 10V9C7 6.23858 9.23858 4 12 4C14.7614 4 17 6.23858 17 9V10C19.2091 10 21 11.7909 21 14C21 15.4806 20.1956 16.8084 19 17.5M7 10C4.79086 10 3 11.7909 3 14C3 15.4806 3.8044 16.8084 5 17.5M7 10C7.43285 10 7.84965 10.0688 8.24006 10.1959M12 12V21M12 12L15 15M12 12L9 15" />
+        </svg>
+        <p class="mt-2">Upload Payment Screenshot</p>
+    </label>
+    <input type="file" id="paymentScreenshot" name="paymentScreenshot" class="d-none" required>
+</div>
+
+
+
+    <button class="submit">Submit</button>
+</form>
+</div>
+    </section>
+         <div class="container"> 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         function updateUPI() {
@@ -77,5 +285,6 @@
             upiQr.src = qrImages[eventSelect.value];
         }
     </script>
+
 </body>
 </html>
