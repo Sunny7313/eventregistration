@@ -1,81 +1,89 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Event Registration</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
-    <style>
-        #upiQr {
-            display: block;
-            margin: 20px auto;
-            max-width: 200px;
-        }
-    </style>
-</head>
-<body>
-    <header class="bg-primary text-white text-center py-4">
-        <h1>Event Registration</h1>
-    </header>
-
-    <section class="container mt-5">
-        <form action="submit.php" method="POST" enctype="multipart/form-data" class="mx-auto" style="max-width: 600px;">
-            <div class="mb-3">
-                <label for="name" class="form-label">Name</label>
-                <input type="text" class="form-control" id="name" name="name" required>
+    <link rel="stylesheet" href="style2.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="left-panel">
+        <h1 class="title">Let's Get Started</h1>
+        <p class="subtitle">
+          Register for our exciting events and showcase your talents!
+        </p>
+        <div class="qr-code">
+          <img
+            id="qrCode"
+            src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=Select%20an%20event"
+            alt="Payment QR Code"
+          />
+        </div>
+        <p>Scan to Pay</p>
+        <p id="amountToPay">Amount to Pay: ₹0</p>
+      </div>
+      <div class="form-section">
+        <form
+          id="registrationForm"
+          action="submit.php"
+          method="POST"
+          enctype="multipart/form-data"
+          class="mx-auto"
+          style="max-width: 600px"
+        >
+          <div class="form-group">
+            <label for="teamName">Team Name</label>
+            <input type="text" id="teamName" name="teamName" required />
+          </div>
+          <div class="form-group">
+            <label for="numMembers">Number of Members</label>
+            <select id="numMembers" name="numMembers" required>
+              <option value="0">Choose number of members</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+            </select>
+          </div>
+          <div id="memberDetails"></div>
+          <div class="form-group">
+            <label for="college">College Name</label>
+            <input type="text" id="college" name="college" required />
+          </div>
+          <div class="form-group">
+            <label for="event">Select Event</label>
+            <select id="event" name="event" required>
+              <option value="">Choose an event</option>
+              <option value="coding">Coding</option>
+              <option value="hackathon">Hackathon</option>
+              <option value="ideathon">Ideathon</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="utr">UTR ID</label>
+            <input type="text" id="utr" name="utr" required />
+          </div>
+          <div class="form-group">
+            <label for="payment">Payment Screenshot</label>
+            <div class="file-input-wrapper">
+              <button class="file-input-button" type="button">
+                Choose File
+              </button>
+              <input
+                type="file"
+                id="payment"
+                accept="image/*"
+                name="paymentScreenshot"
+                required
+              />
             </div>
-            <div class="mb-3">
-                <label for="email" class="form-label">Email</label>
-                <input type="email" class="form-control" id="email" name="email" required>
-            </div>
-            <div class="mb-3">
-                <label for="phone" class="form-label">Phone</label>
-                <input type="text" class="form-control" id="phone" name="phone" required>
-            </div>
-            <div class="mb-3">
-                <label for="rollno" class="form-label">Roll Number</label>
-                <input type="text" class="form-control" id="rollno" name="rollno" required>
-            </div>
-            <div class="mb-3">
-                <label for="college" class="form-label">College Name</label>
-                <input type="text" class="form-control" id="college" name="college" required>
-            </div>
-            <div class="mb-3">
-                <label for="event" class="form-label">Select Event</label>
-                <select class="form-select" id="event" name="event" required onchange="updateUPI()">
-                    <option value="Coding Hackathon">Coding Hackathon</option>
-                    <option value="Robotics Workshop">Robotics Workshop</option>
-                    <option value="AI Seminar">AI Seminar</option>
-                </select>
-            </div>
-            <div class="text-center">
-                <img id="upiQr" src="images/default-qr.png" alt="UPI QR Code">
-            </div>
-            <div class="mb-3">
-                <label for="utr" class="form-label">UTR ID</label>
-                <input type="text" class="form-control" id="utr" name="utr" required>
-            </div>
-            <div class="mb-3">
-                <label for="paymentScreenshot" class="form-label">Upload Payment Screenshot</label>
-                <input type="file" class="form-control" id="paymentScreenshot" name="paymentScreenshot" required>
-            </div>
-            <button type="submit" class="btn btn-primary">Submit</button>
+            <div id="file-name"></div>
+          </div>
+          <button type="submit">Register Now</button>
         </form>
-    </section>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        function updateUPI() {
-            const eventSelect = document.getElementById('event');
-            const upiQr = document.getElementById('upiQr');
-            const qrImages = {
-                "Coding Hackathon": "images/default-qr.png",
-                "Robotics Workshop": "images/event1-qr.png",
-                "AI Seminar": "images/event2-qr.png"
-            };
-            upiQr.src = qrImages[eventSelect.value];
-        }
-    </script>
-</body>
+      </div>
+    </div>
+    <script src="script.js"></script>
+  </body>
 </html>
