@@ -4,6 +4,10 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
 
+require 'PHPMailer/Exception.php';
+require 'PHPMailer/PHPMailer.php';
+require 'PHPMailer/SMTP.php';
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Database connection
     $host = 'localhost';
@@ -16,43 +20,72 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
         // Get form data
-        $name = $_POST['name'];
-        $email = $_POST['email'];
-        $phone = $_POST['phone'];
-        $rollno = $_POST['rollno'];
-        $college = $_POST['college'];
-        $event = $_POST['event'];
         $utr_id = $_POST['utr'];
-        $originalFileName = $_FILES['paymentScreenshot']['name'];
-        
+        $team_name = $_POST['teamName'];
+        $num_members = $_POST['numMembers'];
+        $college_name = $_POST['college'];
+        $event_name = $_POST['event'];
+
         // Handle payment screenshot upload
         $target_dir = "uploads/";
-        $fileExtension = pathinfo($originalFileName, PATHINFO_EXTENSION);
-        $uniqueFileName = pathinfo($originalFileName, PATHINFO_FILENAME) . '_' . time() . '.' . $fileExtension;
-        $target_file = $target_dir . $uniqueFileName;
+        $random_number = rand(100, 999);
+        $file_extension = pathinfo($_FILES['paymentScreenshot']['name'], PATHINFO_EXTENSION);
+        $filename = $team_name . '_' . $random_number . '.' . $file_extension;
+        $target_file = $target_dir . $filename;
 
         if (!move_uploaded_file($_FILES['paymentScreenshot']['tmp_name'], $target_file)) {
             throw new Exception("Failed to upload file.");
         }
-        // Insert data into the database
-        $stmt = $conn->prepare("INSERT INTO registrations (name, email, phone, rollno, college_name, event_name, utr_id, payment_screenshot) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-        $stmt->execute([$name, $email, $phone, $rollno, $college, $event, $utr_id, $uniqueFileName]);
-        if (sendMail($email, $name, $utr_id, $event)) {
-            echo "<script>alert('Registration successful, and email sent!');window.location='index.html'</script>";
-        } else {
-            echo "Registration unsuccessful, email failed to send.";
+
+        // Member details
+        $members = [];
+        for ($i = 1; $i <= $num_members; $i++) {
+            $members[] = [
+                'name' => $_POST["member{$i}_name"] ?? null,
+                'degree' => $_POST["member{$i}_degree"] ?? null,
+                'department' => $_POST["member{$i}_department"] ?? null,
+                'year' => $_POST["member{$i}_year"] ?? null,
+                'email' => $_POST["member{$i}_email"] ?? null,
+                'phone' => $_POST["member{$i}_phone"] ?? null,
+            ];
         }
+
+        // Insert data into the database
+        $stmt = $conn->prepare("INSERT INTO TeamDetails (utr_id, team_name, num_members, college_name, event_name, screenshot, member1_name, member1_degree, member1_department, member1_year, member1_email, member1_phone_number, member2_name, member2_degree, member2_department, member2_year, member2_email, member2_phone_number, member3_name, member3_degree, member3_department, member3_year, member3_email, member3_phone_number, member4_name, member4_degree, member4_department, member4_year, member4_email, member4_phone_number) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->bindParam(1, $utr_id);
+        $stmt->bindParam(2, $team_name);
+        $stmt->bindParam(3, $num_members);
+        $stmt->bindParam(4, $college_name);
+        $stmt->bindParam(5, $event_name);
+        $stmt->bindParam(6, $filename);
+        for ($i = 0; $i < 4; $i++) {
+            $stmt->bindParam(7 + $i * 6, $members[$i]['name']);
+            $stmt->bindParam(8 + $i * 6, $members[$i]['degree']);
+            $stmt->bindParam(9 + $i * 6, $members[$i]['department']);
+            $stmt->bindParam(10 + $i * 6, $members[$i]['year']);
+            $stmt->bindParam(11 + $i * 6, $members[$i]['email']);
+            $stmt->bindParam(12 + $i * 6, $members[$i]['phone']);
+        }
+
+        $stmt->execute();
+
+        // Send confirmation emails
+        foreach ($members as $member) {
+            if ($member['email']) {
+                sendMail($member['email'], $member['name'], $utr_id, $event_name);
+            }
+        }
+
+        echo "<script>alert('Registration successful!');window.location='register.html'</script>";
     } catch (PDOException $e) {
         echo "Error: " . $e->getMessage();
     }
+
+    $conn = null;
 }
 
 function sendMail($recipientEmail, $recipientName, $utrID, $eventName)
 {
-    require("PHPMailer/Exception.php");
-    require("PHPMailer/SMTP.php");
-    require("PHPMailer/PHPMailer.php");
-
     $mail = new PHPMailer(true);
     
     try {
@@ -66,7 +99,7 @@ function sendMail($recipientEmail, $recipientName, $utrID, $eventName)
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
         $mail->Port = 465; // Use 465 for SMTPS
         // Recipients
-        $mail->setFrom('sanyasi.naidu/336@gmail.com', 'Event Team');
+        $mail->setFrom('sanyasi.naidu.336@gmail.com', 'Event Team');
         $mail->addAddress($recipientEmail, $recipientName);
         // Content
         $mail->isHTML(true);
@@ -93,48 +126,4 @@ function sendMail($recipientEmail, $recipientName, $utrID, $eventName)
         return false; // Failed to send email
     }
 }
-
-
-
-/* <?php $servername = "localhost";
-$username = "root";
-$password = ""; 
-$database = "event_registration";
-
-$conn = new mysqli($servername, $username, $password, $database);
-
-// Check connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $name = $_POST['name'];
-    $email = $_POST['email'];
-    $phone = $_POST['phone'];
-    $rollno = $_POST['rollno'];
-    $college = $_POST['college'];
-    $event = $_POST['event'];
-    $utr = $_POST['utr'];
-    $targetDir = "uploads/";
-    $fileName = basename($_FILES["paymentScreenshot"]["name"]);
-    $targetFilePath = $targetDir . $fileName;
-
-    if (move_uploaded_file($_FILES["paymentScreenshot"]["tmp_name"], $targetFilePath)) {
-        $sql = "INSERT INTO registrations (name, email, phone, rollno, college_name, event_name, utr_id, payment_screenshot) 
-                VALUES ('$name', '$email', '$phone', '$rollno', '$college', '$event', '$utr', '$fileName')";
-
-        if ($conn->query($sql) === TRUE) {
-            echo "<script>window.location='index.html';</script>Registration successful and saved in the database.";
-        } else {
-            echo "Error: " . $sql . "<br>" . $conn->error;
-        }
-    } else {
-        echo "File upload failed.";
-    }
-} else {
-    echo "Invalid request.";
-}
-
-$conn->close();
- */
+?>
