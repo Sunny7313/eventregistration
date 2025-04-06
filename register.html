@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Event Registration</title>
+    <link rel="stylesheet" href="style2.css" />
+    <style>
+      #a{
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="left-panel"> 
+        <h1 class="title">Let's Get Started</h1>
+        <p class="subtitle">
+          Register for our exciting events and showcase your talents!
+        </p>
+        <div class="qr-code">
+          <img
+            id="qrCode"
+            src="images/scanner.jpg"
+            alt="Payment QR Code"
+          />
+        </div>
+        <p>Scan to Pay</p>
+        <p id="amountToPay">Amount to Pay: ₹0</p>
+      </div>
+      <div class="form-section">
+        <form
+          id="registrationForm"
+          action="submit.php"
+          method="POST"
+          enctype="multipart/form-data"
+          class="mx-auto"
+          style="max-width: 600px"
+        >
+          <div class="form-group">
+            <label for="teamName">Team Name</label>
+            <input type="text" id="teamName" name="teamName" required />
+          </div>
+          <div class="form-group">
+            <label for="numMembers">Number of Members</label>
+            <select id="numMembers" name="numMembers" required>
+              <option value="0">Choose number of members</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+            </select>
+          </div>
+          <div id="memberDetails"></div>
+          <div class="form-group">
+            <label for="college">College Name</label>
+            <input type="text" id="college" name="college" required />
+          </div>
+          <div class="form-group">
+            <label for="event">Select Event</label>
+            <select id="event" name="event" required>
+              <option value="">Choose an event</option>
+              <option value="Poster_Presentaion">Poster Presentaion</option>
+              <option value="Papar_Presentaion">Papar Presentaion</option>
+              <option value="Project_expo">Project Expo</option>
+              <option value="Ideathon-CSE">Ideathon</option>
+              <option value="Code_Vinyasa-CSE">Code Vinyasa</option>
+              <option value="Tech_quiz-ECE">Tech Quiz</option>
+              <option value="Modeling_&_3d_printing-MECH">Modeling & 3D Printing</option>
+              <option value="Technical_Treasure_Hunt-MECH">Technical Treasure Hunt</option>
+              <option value="Bridge_Bust-CIVIL">Bridge Bust</option>
+              <option value="Business_quiz-MBA">Business Quiz</option>
+              <option value="Startup_idea-MBA">Startup Idea</option>
+            </select>
+          </div>
+          <div class="form-group" id="a">
+            <label for="eventDepartment">Select Event Department</label>
+            <select id="eventDepartment" name="eventDepartment">
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="utr">UTR ID</label>
+            <input type="text" id="utr" name="utr" required />
+          </div>
+          <div class="form-group">
+            <label for="payment">Payment Screenshot</label>
+            <div class="file-input-wrapper">
+              <button class="file-input-button" type="button">
+                Choose File
+              </button>
+              <input
+                type="file"
+                id="payment"
+                accept="image/*"
+                name="paymentScreenshot"
+                required
+              />
+            </div>
+            <div id="file-name"></div>
+          </div>
+          <button type="submit">Register Now</button>
+        </form>
+      </div>
+    </div>
+    <script src="script.js"></script>
+    
+  </body>
+</html>
